@@ -1,17 +1,68 @@
-<footer>
-    <!-- place footer here -->
+<footer class="mt-5 pt-4 border-top bg-white">
+  <div class="container small">
+    <div class="row gy-3">
+      <div class="col-md-4">
+        <h6 class="fw-bold mb-2">Coop Chain System</h6>
+        <p class="mb-2">ระบบสารสนเทศสหกรณ์ จังหวัดชัยภูมิ (PWA + API)</p>
+        <span class="badge text-bg-light" id="footer-api-status">API: ...</span>
+      </div>
+      <div class="col-md-4">
+        <h6 class="fw-bold mb-2">ลิงก์ด่วน</h6>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/app/login">เข้าสู่ระบบสมาชิก</a></li>
+          <li><a href="#modules">โมดูลระบบ</a></li>
+          <li><a href="#stats">สถิติ</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6 class="fw-bold mb-2">ติดต่อ</h6>
+        <ul class="list-unstyled mb-0">
+          <li>อีเมล: info@example.coop</li>
+          <li>โทร: 000-000-0000</li>
+        </ul>
+      </div>
+    </div>
+    <div class="text-center mt-3 pb-2">
+      © <span id="year"></span> Coop Chain System. All rights reserved.
+    </div>
+  </div>
 </footer>
-<!-- Bootstrap JavaScript Libraries -->
+<!-- Bootstrap JavaScript (bundle includes Popper) -->
 <script
-    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"
-></script>
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+  crossorigin="anonymous"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  fetch('/api/health').then(r=>r.json()).then(d=>{
+    const el = document.getElementById('footer-api-status');
+    el.textContent = d.ok ? 'API: OK' : 'API: ERROR';
+    el.className = 'badge text-bg-' + (d.ok ? 'success' : 'danger');
+  }).catch(()=>{
+    const el = document.getElementById('footer-api-status');
+    el.textContent = 'API: DOWN';
+    el.className = 'badge text-bg-danger';
+  });
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-    crossorigin="anonymous"
-></script>
+  // ตรวจสอบ Bootstrap Collapse ทำงานหรือไม่ ถ้าไม่ให้ fallback
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggler = document.querySelector('.navbar-toggler');
+    const target = document.querySelector('#navbarSupportedContent');
+    if (toggler && target) {
+      // ถ้า bootstrap โหลดแล้ว แต่ instance ยังไม่มี
+      if (typeof bootstrap !== 'undefined') {
+        if (!bootstrap.Collapse.getInstance(target)) {
+          new bootstrap.Collapse(target, { toggle: false });
+        }
+      } else {
+        // fallback manual toggle (กรณี bootstrap ไม่โหลด)
+        toggler.addEventListener('click', () => {
+          target.classList.toggle('show');
+        });
+      }
+    }
+  });
+</script>
+<script src="/js/navbar-fix.js"></script>
 </body>
 </html>

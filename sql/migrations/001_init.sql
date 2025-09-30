@@ -1,0 +1,64 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  member_no VARCHAR(50) UNIQUE,
+  national_id_hash VARCHAR(128),
+  name VARCHAR(120),
+  email VARCHAR(120) UNIQUE,
+  phone VARCHAR(30),
+  password_hash VARCHAR(255),
+  consent_online_access TINYINT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS accounts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  account_type ENUM('share','deposit','loan') NOT NULL,
+  balance DECIMAL(14,2) DEFAULT 0,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  account_id INT,
+  tx_type VARCHAR(50),
+  amount DECIMAL(14,2),
+  date DATE,
+  description VARCHAR(255),
+  source_ref VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (account_id) REFERENCES accounts(id),
+  INDEX(account_id,date)
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  token VARCHAR(512),
+  expires_at DATETIME,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  valid TINYINT DEFAULT 1,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  INDEX(token),
+  INDEX(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NULL,
+  action VARCHAR(50),
+  ip VARCHAR(64),
+  user_agent VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  meta JSON NULL
+);
+
+CREATE TABLE IF NOT EXISTS reconciliation_logs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  filename VARCHAR(255),
+  status VARCHAR(30),
+  message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
